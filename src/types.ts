@@ -26,7 +26,7 @@ export interface OverrideSecurity {
   overrideScreenSecurity?: boolean;
 }
 
-export type EditIssueConfig = Notifiable & OverrideEditable & OverrideSecurity
+export type EditIssueConfig = Notifiable & OverrideEditable & OverrideSecurity;
 
 export interface SearchIssuesConfig {
   expand?: string[];
