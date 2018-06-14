@@ -30,6 +30,7 @@
     "@types/jest": "^23.0.0",
     "@types/node": "^10.3.2",
     "jest": "^23.1.0",
+    "ts-dedent": "^1.0.0",
     "ts-jest": "^22.4.6",
     "tslint": "^5.10.0",
     "tslint-config-airbnb": "^5.9.2",
