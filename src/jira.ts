@@ -157,7 +157,7 @@ export class Jira {
   async searchIssuesPage(
     jql: string,
     config: SearchIssuesConfig = {},
-    page: Page = {}
+    page: Page = {},
   ): Promise<Dict<any>> {
     const expandFields = config.expand || [];
     const expand = expandFields.length > 0 ? expandFields.join(',') : undefined;
