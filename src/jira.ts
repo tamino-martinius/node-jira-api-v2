@@ -31,32 +31,36 @@ export class Jira {
     const paramKeys: string[] = Object.keys(params).sort();
     if (paramKeys.length > 0) {
       return '?' + paramKeys.map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
-    } else {
-      return '';
     }
+    return '';
   }
 
-  request(method: RequestMethod, rel: string, params: Dict<any> = {}, body: Dict<any> = {}): Promise<Response> {
+  request(
+    method: RequestMethod,
+    rel: string,
+    params: Dict<any> = {},
+    body: Dict<any> = {},
+  ): Promise<Response> {
     return new Promise((resolve, reject) => {
       const url = new URL(rel, this.apiBaseUrl);
       url.username = this.username;
       url.password = this.password;
       const auth = url.username && url.password ? `${url.username}:${url.password}` : undefined;
       const options: https.RequestOptions = {
+        auth,
+        method,
         hostname: url.hostname,
         protocol: url.protocol,
         port: url.port,
         path: url.pathname + Jira.paramsToQuery(params),
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        auth,
-        method,
       };
       // console.log(options, url.toJSON());
 
-      const req = https.request(options, res => {
+      const req = https.request(options, (res) => {
         let body = '';
         res.on('data', buffer => body += buffer.toString());
         res.on('end', () => resolve({
@@ -78,7 +82,7 @@ export class Jira {
     return res.status === 201 ? res.data : undefined;
   }
 
-  async getIssue(keyOrId: string): Promise<Issue | undefined>{
+  async getIssue(keyOrId: string): Promise<Issue | undefined> {
     const res = await this.request(RequestMethod.GET, `issue/${keyOrId}`);
     return res.status === 200 ? res.data : undefined;
   }
@@ -88,13 +92,16 @@ export class Jira {
     return res.status === 204;
   }
 
-  async editIssue(keyOrId: string, body: Dict<any>, config: EditIssueConfig = {}): Promise<Issue | undefined> {
+  async editIssue(
+    keyOrId: string,
+    body: Dict<any>,
+    config: EditIssueConfig = {},
+  ): Promise<Issue | undefined> {
     const success = await this.updateIssue(keyOrId, body, config);
     if (success) {
       return await this.getIssue(keyOrId);
-    } else {
-      return undefined;
     }
+    return undefined;
   }
 
   async deleteIssue(keyOrId: string, deleteSubtasks: boolean = true): Promise<boolean> {
@@ -126,6 +133,7 @@ export class Jira {
       maxResults: 100,
       startAt: 0,
       ...page,
+      // tslint:disable-next-line:max-line-length
       // TODO orderBy, expand https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-get
     });
     return res.status === 200 ? res.data : undefined;
@@ -140,7 +148,11 @@ export class Jira {
     });
   }
 
-  async searchIssuesPage(jql: string, config: SearchIssuesConfig = {}, page: Page = {}): Promise<Dict<any>> {
+  async searchIssuesPage(
+    jql: string,
+    config: SearchIssuesConfig = {},
+    page: Page = {}
+  ): Promise<Dict<any>> {
     const expandFields = config.expand || [];
     const expand = expandFields.length > 0 ? expandFields.join(',') : undefined;
     const res = await this.request(RequestMethod.POST, `search`, {}, {
@@ -158,13 +170,16 @@ export class Jira {
     return res.status === 200 ? res.data : {};
   }
 
+  // tslint:disable-next-line:max-line-length
   // TODO Add Comment https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-post
 
+  // tslint:disable-next-line:max-line-length
   // TODO Get Comment https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-id-get
 
+  // tslint:disable-next-line:max-line-length
   // TODO Update Comment https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-id-put
 
   // TODO
-};
+}
 
 export default Jira;
