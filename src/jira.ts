@@ -8,15 +8,9 @@ import {
   Page,
   SearchIssuesConfig,
 } from './types';
-
-/// @ts-ignore
-import { URL, Url as UrlFallback } from 'url';
+import { URL } from 'url';
 import https from 'https';
 import { Generator } from './generator';
-
-/// @ts-ignore
-// tslint:disable-next-line:variable-name
-const Url = URL || UrlFallback;
 
 export class Jira {
   private url: URL;
@@ -26,11 +20,11 @@ export class Jira {
   private version: string;
 
   constructor(config: JiraConfig) {
-    this.url = new Url(config.url);
+    this.url = new URL(config.url);
     this.username = config.username;
     this.password = config.password;
     this.version = config.version || '2';
-    this.apiBaseUrl = new Url(`rest/api/${this.version}/`, this.url);
+    this.apiBaseUrl = new URL(`rest/api/${this.version}/`, this.url);
   }
 
   static paramsToQuery(params: Dict<any> = {}): string {
@@ -48,7 +42,7 @@ export class Jira {
     body: Dict<any> = {},
   ): Promise<Response> {
     return new Promise((resolve, reject) => {
-      const url = new Url(rel, this.apiBaseUrl);
+      const url = new URL(rel, this.apiBaseUrl);
       url.username = this.username;
       url.password = this.password;
       const auth = url.username && url.password ? `${url.username}:${url.password}` : undefined;
