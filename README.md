@@ -3,6 +3,10 @@
 [![Build Status](https://travis-ci.org/tamino-martinius/node-jira-api-v2.svg?branch=master)](https://travis-ci.org/tamino-martinius/node-jira-api-v2)
 [![codecov](https://codecov.io/gh/tamino-martinius/node-jira-api-v2/branch/master/graph/badge.svg)](https://codecov.io/gh/tamino-martinius/node-jira-api-v2)
 
+## WIP
+
+This package is still in development and not yet released.
+
 ## Changelog
 
 See [history](HISTORY.md) for more details.
