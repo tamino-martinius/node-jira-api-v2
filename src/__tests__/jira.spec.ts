@@ -216,5 +216,80 @@ describe('Jira', () => {
 
   })
 
+  describe('#deleteIssue', () => {
+    let deleteSubtasks = false;
+
+    let issueKey = 'JIRA-1234';
+    const subject = () => getJira().deleteIssue(issueKey, deleteSubtasks);
+
+    it('makes call to jira API', async () => {
+      await subject();
+      expect(requestString).toEqual(dedent`
+        DELETE https://foo:bar@example.com/rest/api/2/issue/${issueKey}?deleteSubtasks=false
+      `);
+    });
+
+    context('when issue is deleted', {
+      definitions() {
+        responseStatus = 204;
+      },
+      tests() {
+        it('returns true', async () => {
+          const issue = await subject();
+          expect(issue).toBeTruthy();
+        });
+      },
+    });
+
+    context('when request is malformed', {
+      definitions() {
+        responseStatus = 400;
+      },
+      tests() {
+        it('returns false', async () => {
+          const issue = await subject();
+          expect(issue).toBeFalsy();
+        });
+      },
+    });
+
+    context('when delete issue is unauthorized', {
+      definitions() {
+        responseStatus = 403;
+      },
+      tests() {
+        it('returns false', async () => {
+          const issue = await subject();
+          expect(issue).toBeFalsy();
+        });
+      },
+    });
+
+    context('when delete issue is forbidden', {
+      definitions() {
+        responseStatus = 403;
+      },
+      tests() {
+        it('returns false', async () => {
+          const issue = await subject();
+          expect(issue).toBeFalsy();
+        });
+      },
+    });
+
+    context('when issue is not found', {
+      definitions() {
+        responseStatus = 404;
+      },
+      tests() {
+        it('returns false', async () => {
+          const issue = await subject();
+          expect(issue).toBeFalsy();
+        });
+      },
+    });
+
+  })
+
 });
 
