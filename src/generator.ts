@@ -1,4 +1,4 @@
-import Jira from './jira';
+import { Jira } from './jira';
 
 import {
   GeneratorConfig,
@@ -20,12 +20,16 @@ export class Generator {
 
   async *iterator(): AsyncIterableIterator<any> {
     while (this.crawling) {
-      const page = await this.fn.call(this.jira, ...this.args, { startsAt: this.page * this.pageSize });
+      const page = await this.fn.call(
+        this.jira,
+        ...this.args,
+        { startsAt: this.page * this.pageSize },
+      );
       this.page += 1;
       this.crawling = this.crawling && page.total > this.page * this.pageSize;
       this.data.push(...page[this.key]);
       while (this.index < this.data.length) {
-        yield this.data[this.index++];
+        yield this.data[this.index += 1];
       }
     }
     return false;
