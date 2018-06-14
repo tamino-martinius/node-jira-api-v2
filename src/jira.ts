@@ -4,7 +4,6 @@ import {
   RequestMethod,
   Issue,
   Response,
-  Notifiable,
   EditIssueConfig,
   Page,
   SearchIssuesConfig,
@@ -40,7 +39,6 @@ export class Jira {
   request(method: RequestMethod, rel: string, params: Dict<any> = {}, body: Dict<any> = {}): Promise<Response> {
     return new Promise((resolve, reject) => {
       const url = new URL(rel, this.apiBaseUrl);
-      const paramKeys: string[] = Object.keys(params).sort();
       url.username = this.username;
       url.password = this.password;
       const auth = url.username && url.password ? `${url.username}:${url.password}` : undefined;
