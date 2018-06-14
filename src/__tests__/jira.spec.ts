@@ -5,7 +5,7 @@ import {
   Dict,
 } from '../';
 import https from 'https';
-import dedent from '../dedent';
+import { dedent } from 'ts-dedent';
 
 jest.mock('https');
 let responseStatus: number = 902;
