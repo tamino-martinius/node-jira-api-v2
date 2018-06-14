@@ -19,15 +19,18 @@ const requestMock = function (options, cb) {
   url += options.hostname;
   if (options.port) url += `:${options.port}`;
   url += options.path;
-  curlString += `curl --request ${options.method} --url '${url}' --header 'Content-Type: application/json' --header 'Accept: application/json'`;
-  requestString = `${options.method} ${url}`
+  curlString +=
+    `curl --request ${options.method} --url '${url}' --header 'Content-Type: application/json'` +
+    ` --header 'Accept: application/json'`
+  ;
+  requestString = `${options.method} ${url}`;
   const callbacks: Dict<any> = {};
   cb({
     on(event, cb) {
       callbacks[event] = cb;
     },
     statusCode: responseStatus,
-  })
+  });
   this.write = (str) => {
     requestString += `\n${str}`;
     curlString += ` --data '${str}'`;
@@ -37,7 +40,7 @@ const requestMock = function (options, cb) {
       callbacks.data(JSON.stringify(responseBody));
       callbacks.end();
     }
-  }
+  };
   return this;
 };
 
@@ -52,28 +55,31 @@ beforeEach(() => {
 });
 
 describe('Jira', () => {
-  let url = 'https://example.com';
-  let username = 'foo';
-  let password = 'bar';
+  const url = 'https://example.com';
+  const username = 'foo';
+  const password = 'bar';
 
   const getJira = () => new Jira({ url, username, password });
 
   describe('#editIssue', () => {
-    let updateHistory = false;
-    let fields = {};
-    let historyMetadata = undefined;
-    let issueList = undefined;
-    let properties = undefined;
-    let transition = undefined;
-    let update = undefined;
-    const subject = () => getJira().createIssue({
-      fields,
-      historyMetadata,
-      issueList,
-      properties,
-      transition,
-      update,
-    }, updateHistory);
+    const updateHistory = false;
+    const fields = {};
+    const historyMetadata = undefined;
+    const issueList = undefined;
+    const properties = undefined;
+    const transition = undefined;
+    const update = undefined;
+    const subject = () => getJira().createIssue(
+      {
+        fields,
+        historyMetadata,
+        issueList,
+        properties,
+        transition,
+        update,
+      },
+      updateHistory,
+    );
 
     it('makes call to jira API', async () => {
       await subject();
@@ -107,17 +113,17 @@ describe('Jira', () => {
         });
       },
     });
-  })
+  });
 
   describe('#getIssue', () => {
-    let issueKey = 'JIRA-1234';
+    const issueKey = 'JIRA-1234';
     const subject = () => getJira().getIssue(issueKey);
 
     it('makes call to jira API', async () => {
       await subject();
-      expect(requestString).toEqual(
-        'GET https://foo:bar@example.com/rest/api/2/issue/JIRA-1234'
-      );
+      expect(requestString).toEqual(dedent`
+        GET https://foo:bar@example.com/rest/api/2/issue/JIRA-1234
+      `);
     });
 
     context('when issue is found', {
@@ -144,36 +150,41 @@ describe('Jira', () => {
         });
       },
     });
-  })
+  });
 
   describe('#updateIssue', () => {
-    let notifyUsers = false;
-    let overrideEditableFlag = false;
-    let overrideScreenSecurity = false;
-    let fields = {};
-    let historyMetadata = undefined;
-    let issueList = undefined;
-    let properties = undefined;
-    let transition = undefined;
-    let update = undefined;
-    let issueKey = 'JIRA-1234';
-    const subject = () => getJira().updateIssue(issueKey, {
-      fields,
-      historyMetadata,
-      issueList,
-      properties,
-      transition,
-      update,
-    }, {
-      notifyUsers,
-      overrideEditableFlag,
-      overrideScreenSecurity,
-    });
+    const notifyUsers = false;
+    const overrideEditableFlag = false;
+    const overrideScreenSecurity = false;
+    const fields = {};
+    const historyMetadata = undefined;
+    const issueList = undefined;
+    const properties = undefined;
+    const transition = undefined;
+    const update = undefined;
+    const issueKey = 'JIRA-1234';
+    const subject = () => getJira().updateIssue(
+      issueKey,
+      {
+        fields,
+        historyMetadata,
+        issueList,
+        properties,
+        transition,
+        update,
+      },
+      {
+        notifyUsers,
+        overrideEditableFlag,
+        overrideScreenSecurity,
+      },
+    );
 
     it('makes call to jira API', async () => {
       await subject();
+      const query = 'notifyUsers=false&overrideEditableFlag=false&overrideScreenSecurity=false';
       expect(requestString).toEqual(dedent`
-        PUT https://foo:bar@example.com/rest/api/2/issue/${issueKey}?notifyUsers=false&overrideEditableFlag=false&overrideScreenSecurity=false
+        PUT https://foo:bar@example.com/rest/api/2/issue/${issueKey}?${query}
         {"fields":{}}
       `);
     });
@@ -213,13 +224,12 @@ describe('Jira', () => {
         });
       },
     });
-
-  })
+  });
 
   describe('#deleteIssue', () => {
-    let deleteSubtasks = false;
+    const deleteSubtasks = false;
 
-    let issueKey = 'JIRA-1234';
+    const issueKey = 'JIRA-1234';
     const subject = () => getJira().deleteIssue(issueKey, deleteSubtasks);
 
     it('makes call to jira API', async () => {
@@ -288,23 +298,22 @@ describe('Jira', () => {
         });
       },
     });
-
-  })
+  });
 
   describe('#assignIssue', () => {
-    let accountId = undefined;
-    let active = undefined;
-    let applicationRoles = undefined;
-    let avatarUrls = undefined;
-    let displayName = undefined;
-    let emailAddress = undefined;
-    let expand = undefined;
-    let groups = undefined;
-    let locale = undefined;
-    let name = 'foo';
-    let self = undefined;
-    let timeZone = undefined;
-    let issueKey = 'JIRA-1234';
+    const accountId = undefined;
+    const active = undefined;
+    const applicationRoles = undefined;
+    const avatarUrls = undefined;
+    const displayName = undefined;
+    const emailAddress = undefined;
+    const expand = undefined;
+    const groups = undefined;
+    const locale = undefined;
+    const name = 'foo';
+    const self = undefined;
+    const timeZone = undefined;
+    const issueKey = 'JIRA-1234';
 
     const subject = () => getJira().assignIssue(issueKey, {
       accountId,
@@ -376,6 +385,5 @@ describe('Jira', () => {
         });
       },
     });
-  })
+  });
 });
-
