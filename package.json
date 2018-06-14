@@ -16,7 +16,7 @@
     "url": "https://github.com/tamino-martinius/node-jira-api-v2.git"
   },
   "engines": {
-    "node": ">=6.10"
+    "node": ">=6.14.0"
   },
   "scripts": {
     "coverage": "rm -rf coverage* && jest --coverage",
