@@ -196,6 +196,10 @@ export class Jira {
     return items;
   }
 
+  static values<T>(dict: Dict<T>): T[] {
+    return Object.keys(dict).map(key => dict[key]);
+  }
+
   // tslint:disable-next-line:max-line-length
   // TODO Add Comment https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-post
 
