@@ -200,6 +200,39 @@ export class Jira {
     return Object.keys(dict).map(key => dict[key]);
   }
 
+  async searchIssues(
+    jql: string,
+    config: SearchIssuesConfig = {},
+    limit: number = 100,
+  ) {
+    const pageSize = Math.min(limit, 100);
+    const getPage = (pageNumber: number) => this.searchIssuesPage(jql, config, {
+      startsAt: pageSize * pageNumber,
+      maxResults: pageSize,
+    });
+    const firstPage = await getPage(0);
+    if (firstPage.total > limit) {
+      const pageCount = Math.ceil(firstPage.total / pageSize);
+      const pageRequests = Jira.range(1, pageCount - 1).map(
+        pageNumber => getPage(pageNumber),
+      );
+
+      const pages = await Promise.all(pageRequests);
+      pages.unshift(firstPage);
+
+      // Save values to dict to prevent duplicates caused
+      // by overlapping pages on race conditions
+      return Jira.values(pages.reduce(
+        (dict, page) => {
+          for (const issue of page.issues) dict[issue.key] = issue;
+          return dict;
+        },
+        <Dict<any>>{},
+      ));
+    }
+    return firstPage.issues;
+  }
+
   // tslint:disable-next-line:max-line-length
   // TODO Add Comment https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-post
 
