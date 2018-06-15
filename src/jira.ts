@@ -7,10 +7,10 @@ import {
   EditIssueConfig,
   Page,
   SearchIssuesConfig,
+  GeneratorConfig,
 } from './types';
 import { URL } from 'url';
 import https from 'https';
-import { Generator } from './generator';
 
 export class Jira {
   private url: URL;
@@ -77,6 +77,27 @@ export class Jira {
     });
   }
 
+  async *generate<T>(config: GeneratorConfig): AsyncIterableIterator<T> {
+    let crawling = true;
+    let page = 0;
+    let index = 0;
+    const buffer: T[] = [];
+    while (crawling) {
+      const response = await config.fn.apply(
+        this,
+        ...config.args,
+        { startsAt: page * config.pageSize },
+      );
+      page += 1;
+      crawling = crawling && response.total > page * config.pageSize;
+      buffer.push(...response[config.key]);
+      while (index < buffer.length) {
+        yield buffer[index += 1];
+      }
+    }
+    return false;
+  }
+
   async createIssue(body: Dict<any>, updateHistory: boolean = false): Promise<Issue | undefined> {
     const res = await this.request(RequestMethod.POST, `issue`, { updateHistory }, body);
     return res.status === 201 ? res.data : undefined;
@@ -139,8 +160,8 @@ export class Jira {
     return res.status === 200 ? res.data : undefined;
   }
 
-  searchIssuesGenerator(jql: string, config: SearchIssuesConfig = {}): Generator {
-    return new Generator(this, {
+  searchIssuesGenerator(jql: string, config: SearchIssuesConfig = {}): AsyncIterableIterator<any> {
+    return this.generate({
       fn: this.searchIssuesPage,
       args: [jql, config],
       key: 'issues',
