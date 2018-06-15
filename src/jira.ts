@@ -186,6 +186,16 @@ export class Jira {
     return res.status === 200 ? res.data : {};
   }
 
+  static range(start: number, end: number, step: number = 1): number[] {
+    const items: number[] = [];
+    let current: number = start;
+    while (current < end) {
+      items.push(current);
+      current += step;
+    }
+    return items;
+  }
+
   // tslint:disable-next-line:max-line-length
   // TODO Add Comment https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-comment-post
 
