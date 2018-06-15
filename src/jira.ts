@@ -80,8 +80,6 @@ export class Jira {
   async *generate<T>(config: GeneratorConfig): AsyncIterableIterator<T> {
     let crawling = true;
     let page = 0;
-    let index = 0;
-    const buffer: T[] = [];
     while (crawling) {
       const response = await config.fn.apply(
         this,
@@ -90,10 +88,7 @@ export class Jira {
       );
       page += 1;
       crawling = crawling && response.total > page * config.pageSize;
-      buffer.push(...response[config.key]);
-      while (index < buffer.length) {
-        yield buffer[index += 1];
-      }
+      yield* response[config.key];
     }
     return false;
   }
